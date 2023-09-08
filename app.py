@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request
 from github import Github, GithubIntegration
 import json
+import subprocess
 
 
 app = Flask(__name__)
@@ -49,16 +50,18 @@ def bot():
     )
     repo = git_connection.get_repo(f"{owner}/{repo_name}")
 
-    print(type(repo))
+    local_dir = "./code_paste/bare"
+
+    clone_command = f'git clone --bare https://github.com/{owner}/{repo_name}.git {local_dir}'
+
+    subprocess.run(clone_command, shell=True)
 
 
-    local_dir = "./code_paste/"
 
 
-
-    repo_contents = repo.get_contents(".git")
-    print(f"==>> type(repo_contents): {type(repo_contents)}")
-    print(f"==>> repo_contents: {repo_contents}")
+    # repo_contents = repo.get_contents(".git")
+    # print(f"==>> type(repo_contents): {type(repo_contents)}")
+    # print(f"==>> repo_contents: {repo_contents}")
 
 
 
