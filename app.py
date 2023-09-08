@@ -2,6 +2,7 @@ import os
 import requests
 from flask import Flask, request
 from github import Github, GithubIntegration
+import json
 
 
 app = Flask(__name__)
@@ -26,22 +27,16 @@ git_integration = GithubIntegration(
 def bot():
     # Get the event payload
     payload = request.json
-    print(f"==>> payload: {payload}")
+    #print(f"==>> payload: {payload}")
 
 
-
-    # Check if the event is a GitHub PR creation event
-    if not all(k in payload.keys() for k in ['action', 'pull_request']) and \
-            payload['action'] == 'opened':
-        
-        print("I am here!!!")
-        return "ok"
 
     owner = payload['repository']['owner']['login']
     repo_name = payload['repository']['name']
 
-    print("\n\n\n\n\n Yeah boiiiiiii \n\n\n\n")
+    pretty_json = json.dumps(payload, indent=4)
 
+    print(f"payload: {pretty_json}")
 
 
     # Get a git connection as our bot
@@ -54,20 +49,25 @@ def bot():
     )
     repo = git_connection.get_repo(f"{owner}/{repo_name}")
 
-    issue = repo.get_issue(number=payload['pull_request']['number'])
+    print(type(repo))
 
-    #Call meme-api to get a random meme
-    response = requests.get(url='https://meme-api.herokuapp.com/gimme')
-    if response.status_code != 200:
-        # print("\n\n\n\n\n UNDER RESPONSE \n\n\n\n")
-        return 'ok'
 
-    #Get the best resolution meme
-    #meme_url = response.json()['preview'][-1]
-    #Create a comment with the random meme
-    issue.create_comment(f"Hello world!!!!")
+    local_dir = "./code_paste/"
 
-    print("\n\n\n\n\n MADE IT TO END \n\n\n\n")
+
+
+    repo_contents = repo.get_contents(".git")
+    print(f"==>> type(repo_contents): {type(repo_contents)}")
+    print(f"==>> repo_contents: {repo_contents}")
+
+
+
+    # issue = repo.get_issue(number=payload['pull_request']['number'])
+
+
+
+
+    #print("\n\n\n\n\n MADE IT TO END \n\n\n\n")
 
 
 
